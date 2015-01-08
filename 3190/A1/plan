@@ -1,0 +1,6 @@
+comments
+change from integer to character because f95 better
+format with label, ew
+if statements changed from .EQ, easier to read
+Use ICHAR to compare
+Letters I - L are integers
