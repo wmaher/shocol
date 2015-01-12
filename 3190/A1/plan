@@ -4,3 +4,11 @@ format with label, ew
 if statements changed from .EQ, easier to read
 Use ICHAR to compare
 Letters I - L are integers
+
+Look at what the problem is and try to identify the steps at certain parts.
+
+1. Read Source String character by character
+2a. If character is an operand, put it in polish stack, iterate polish index
+2b. If it's an operator AND it's precedence is higher, put in OPSTCK
+2c. If it's an operator AND it's precedence IS NOT higher, empty OPSTCK, continue
+2d. If it's a RIGHT BRACKET, empty the OPSTCK

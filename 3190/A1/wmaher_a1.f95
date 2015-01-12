@@ -21,57 +21,84 @@ program wmaher_a1
     DATA BLANK,LPAREN,RPAREN,PLUS,MINUS,ASTRSK,SLASH /' ','(',')','+','-','*','/'/
 !Initialize Arrays
 	INTEGER *1 A
-	DO A=1, 40
+	DO L=1, 40
+!LABEL 1
 		SHIER(L) = 0
 		OHIER(L) = 0
 		OPSTCK(L) = ICHAR(BLANK)
 		POLISH(L) = ICHAR(BLANK)
 !Read String
 !double change please
-		READ(*,300) SOURCE
-		300 FORMAT(40A)
+		READ(*,30) SOURCE
+		30 FORMAT(40A)
 		DO M = 1,40
 			IF(M<=80) THEN
-				IF(SOURCE(M) == ICHAR(BLANK)) THEN
-!Blank String check
-					IF(M == 1) THEN 
-						STOP
-					ELSE
-!initialize pointers
-!LABEL '2'
-					
-						SHIER(M) = 0
-						OHIER(1) = -1
-						I = 1
-						J = 2
-						K = 1
-!LABEL '3'
+				IF(SOURCE(M) == ICHAR(BLANK)&&M==1) THEN
+!Blank String check 
+					STOP
+				ELSE IF(SOURCE(M)==ICHAR(BLANK)&&M/=1) THEN
+!LABEL 2
+					I=1
+					J=2
+					K=1
+					OHIER(1)=-1
+!LABEL 3
+					DO A=1,40
 !check for operand
-						DO N = 1, 40
-							IF(SHIER(I)==0) THEN
-								POLISH(K)=SOURCE(I)
-								I=I+1
-								K=K+1
-								DO L = 1,40
-									IF(OHIER(J-1)>=SHIER(I)) THEN
-										POLISH(K)=OPSTCK(J-1)
-										J=J-1
-										K=K+1
-									ELSE IF (I==M) THEN
-!Print polish
-										STOP
-									ELSE
-										EXIT
-									END IF
-								END DO
-!right parentheses
-							ELSE IF (SHIER(I)==2) THEN
-								I=I+1
-								J=J-1
+						IF(SHIER(I)==0) THEN
+							POLISH(K)=SOURCE(I)
+							I=I+1
+							K=K+1
+!Higher precedence check	
+!FUNCTION?
+
+							DO WHILE(OHIER(J-1)>=SHIER(I))
+								IF(OHIER(J-1)>=SHIER(I))THEN
+									POLISH(K)=OPSTCK(J-1)
+									J=J-1
+									K=K+1
+								END IF
+							END DO
+							IF(I==M) THEN
+!print polish
+							WRITE (*, 400) "INPUT: ", SOURCE, "RPN:   ", POLISH
+ 							400 FORMAT (1H ,A7, 40A1/1H , A7, 40A1)
+ 							CONTINUE
+							ELSE
+								CYCLE
 							END IF
-						END DO
-					END IF
-				ELSE IF (SOURCE(M) == ICHAR(LPAREN)) THEN 
+						ELSE IF(SOURCE(I)==ICHAR(RPAREN)) THEN
+							I=I+1
+							J=J-1
+							DO WHILE(OHIER(J-1)>=SHIER(I))
+								IF(OHIER(J-1)>=SHIER(I))THEN
+									POLISH(K)=OPSTCK(J-1)
+									J=J-1
+									K=K+1
+								ELSE
+									OHIER(J)=SOURCE(I)
+									OHIER(J)=SHIER(I)
+									I=I+1
+									J=J+1
+								END IF
+							END DO
+						ELSE
+							OPSTCK(J)=SHIER(I)
+							I=I+1
+							J+J+1
+						END IF
+					END DO
+				END IF
+!initialize pointers
+					
+					SHIER(M) = 0
+					OHIER(1) = -1
+					I = 1
+					J = 2
+					K = 1
+!assign SHIER rankings for operators
+					
+				IF (SOURCE(M) == ICHAR(LPAREN)) THEN 
 					SHIER(M) = 1
 				ELSE IF (SOURCE(M) == ICHAR(RPAREN)) THEN
 					SHIER(M) = 2
@@ -83,8 +110,6 @@ program wmaher_a1
 			ELSE
 				PRINT *,"NO BLANKS"
 			END IF
-	400 END DO
+		END DO
 	END DO
-
 end program
-
