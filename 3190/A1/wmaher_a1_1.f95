@@ -1,0 +1,115 @@
+! TRANSLATING ALGRBRAIC EXPRESSIONS TO POLISH NOTATION
+!
+! THE VARIABLE NAMES AND THEIR MEANINGS ARE AS FOLLOWS:
+!     SOURCE     THE INPUT STRING, IN NORMAL ALGEBRAIC FORM
+!     SHIER      ARRAY CONTAINING THE HIERARCHY NUMBERS OF THE INPUT
+!     OPSTCK     'OPERATOR STACK': THE OPERATORS FROM THE INPUT
+!     OHIER      ARRAY CONTAINING THE HIERARCHY NUMBERS OF THE OPERATORS
+!     POLISH     THE OUTPUT STRING, IN POLISH NOTATION
+!
+!     L          DO INDEX USED IN INITIALIZING
+!     M          DO INDEX USED IN SETTING UP SHIER ARRAY
+!     I          POINTER TO INDEX STRING (SOURCE AND SHIER)
+!     J          POINTER TO OPERATOR STACK (OPSTCK AND OHIER)
+!     K          POINTER TO OUTPUT STRING (POLISH)
+!
+!     THE OTHER VARIABLES ARE ACTUALLY CONSTANTS, AND ARE
+!     DEFINED IN THE DATA STATEMENT.
+program wmaher_a1
+    INTEGER*1 SOURCE(40), SHIER(40), OPSTCK(40), OHIER(40), POLISH(40)
+    CHARACTER*1 BLANK, LPAREN, RPAREN, PLUS, MINUS, ASTRSK, SLASH
+    DATA BLANK,LPAREN,RPAREN,PLUS,MINUS,ASTRSK,SLASH /' ','(',')','+','-','*','/'/
+!Initialize Arrays
+	INTEGER *1 A
+	DO L=1, 40
+!LABEL 1
+		SHIER(L) = 0
+		OHIER(L) = 0
+		OPSTCK(L) = ICHAR(BLANK)
+		POLISH(L) = ICHAR(BLANK)
+!Read String
+!double change please
+		READ(*,30) SOURCE
+		30 FORMAT(40A)
+		DO M = 1,40
+			IF(M<=80) THEN
+				IF(SOURCE(M) == ICHAR(BLANK)&&M==1) THEN
+!Blank String check 
+					STOP
+				ELSE IF(SOURCE(M)==ICHAR(BLANK)&&M/=1) THEN
+!LABEL 2
+					I=1
+					J=2
+					K=1
+					OHIER(1)=-1
+!LABEL 3
+					DO A=1,40
+!check for operand
+						IF(SHIER(I)==0) THEN
+							POLISH(K)=SOURCE(I)
+							I=I+1
+							K=K+1
+!Higher precedence check	
+!FUNCTION?
+
+							DO WHILE(OHIER(J-1)>=SHIER(I))
+								IF(OHIER(J-1)>=SHIER(I))THEN
+									POLISH(K)=OPSTCK(J-1)
+									J=J-1
+									K=K+1
+								END IF
+							END DO
+							IF(I==M) THEN
+!print polish
+							WRITE (*, 400) "INPUT: ", SOURCE, "RPN:   ", POLISH
+ 							400 FORMAT (1H ,A7, 40A1/1H , A7, 40A1)
+ 							CONTINUE
+							ELSE
+								CYCLE
+							END IF
+						ELSE IF(SOURCE(I)==ICHAR(RPAREN)) THEN
+							I=I+1
+							J=J-1
+							DO WHILE(OHIER(J-1)>=SHIER(I))
+								IF(OHIER(J-1)>=SHIER(I))THEN
+									POLISH(K)=OPSTCK(J-1)
+									J=J-1
+									K=K+1
+								ELSE
+									OHIER(J)=SOURCE(I)
+									OHIER(J)=SHIER(I)
+									I=I+1
+									J=J+1
+								END IF
+							END DO
+						ELSE
+							OPSTCK(J)=SHIER(I)
+							I=I+1
+							J+J+1
+						END IF
+					END DO
+				END IF
+!initialize pointers
+					
+					SHIER(M) = 0
+					OHIER(1) = -1
+					I = 1
+					J = 2
+					K = 1
+!assign SHIER rankings for operators
+					
+				IF (SOURCE(M) == ICHAR(LPAREN)) THEN 
+					SHIER(M) = 1
+				ELSE IF (SOURCE(M) == ICHAR(RPAREN)) THEN
+					SHIER(M) = 2
+				ELSE IF(SOURCE(M) == ICHAR(PLUS).OR.SOURCE(M) == ICHAR(MINUS)) THEN
+					SHIER(M) = 3
+				ELSE IF (SOURCE(M) == ICHAR(ASTRSK).OR.SOURCE(M) == ICHAR(SLASH)) THEN
+					SHIER(M) = 4
+				END IF
+			ELSE
+				PRINT *,"NO BLANKS"
+			END IF
+		END DO
+	END DO
+end program
